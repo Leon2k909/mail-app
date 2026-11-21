@@ -1,6 +1,7 @@
 param(
     [Parameter(Mandatory)] [string] $ElectronExe,
     [string] $NativeExe = (Join-Path $PSScriptRoot 'target/release/mail-preview.exe'),
+    [string] $PreviousNativeExe,
     [ValidateRange(1, 15)] [int] $Runs = 5
 )
 
@@ -59,27 +60,34 @@ function Get-Median($values) {
 $electronArgs = @("--user-data-dir=`"$profile`"", '"--host-resolver-rules=MAP * ~NOTFOUND"')
 $nativeArgs = @('--empty')
 $nativeTitle = 'Mail Preview · Rust / GPUI'
-$null = Measure-Launch $electron $electronArgs 'mail'
-$null = Measure-Launch $native $nativeArgs $nativeTitle
-
-$electronMeasurements = @()
-$nativeMeasurements = @()
-foreach ($run in 1..$Runs) {
-    $electronMeasurements += Measure-Launch $electron $electronArgs 'mail'
-    $nativeMeasurements += Measure-Launch $native $nativeArgs $nativeTitle
-}
-
 $electronBytes = (Get-ChildItem -LiteralPath $electron.DirectoryName -Recurse -File |
     Measure-Object -Property Length -Sum).Sum
-@(
-    @{ App = 'Electron 1.2.0'; Runs = $electronMeasurements; Bytes = $electronBytes },
-    @{ App = 'Rust / GPUI'; Runs = $nativeMeasurements; Bytes = $native.Length }
-) | ForEach-Object {
+$builds = @(
+    @{ App = 'Electron 1.2.0'; Exe = $electron; Arguments = $electronArgs; Title = 'mail'; Bytes = $electronBytes },
+    @{ App = 'Rust / GPUI'; Exe = $native; Arguments = $nativeArgs; Title = $nativeTitle; Bytes = $native.Length }
+)
+if ($PreviousNativeExe) {
+    $previous = Get-Item -LiteralPath (Resolve-Path -LiteralPath $PreviousNativeExe)
+    $builds += @{ App = 'Previous Rust / GPUI'; Exe = $previous; Arguments = $nativeArgs; Title = $nativeTitle; Bytes = $previous.Length }
+}
+
+foreach ($build in $builds) {
+    $build.Samples = @()
+    $null = Measure-Launch $build.Exe $build.Arguments $build.Title
+}
+for ($run = 0; $run -lt $Runs; $run++) {
+    for ($offset = 0; $offset -lt $builds.Count; $offset++) {
+        $build = $builds[($run + $offset) % $builds.Count]
+        $build.Samples += Measure-Launch $build.Exe $build.Arguments $build.Title
+    }
+}
+
+$builds | ForEach-Object {
     [pscustomobject]@{
         App = $_.App
-        MedianLaunchMs = [math]::Round((Get-Median $_.Runs.StartupMs))
-        MedianPrivateWorkingSetMiB = [math]::Round((Get-Median $_.Runs.PrivateWorkingSetMiB), 1)
-        MedianProcesses = Get-Median $_.Runs.Processes
+        MedianLaunchMs = [math]::Round((Get-Median $_.Samples.StartupMs))
+        MedianPrivateWorkingSetMiB = [math]::Round((Get-Median $_.Samples.PrivateWorkingSetMiB), 1)
+        MedianProcesses = Get-Median $_.Samples.Processes
         UnpackedMiB = [math]::Round($_.Bytes / 1MB, 1)
     }
 }

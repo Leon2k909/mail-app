@@ -17,7 +17,7 @@ The preview uses sample mail and has no account setup, live IMAP/SMTP, or auto-u
 ## Test
 
 ```powershell
-cargo test --release --locked --manifest-path native/Cargo.toml
+cargo test --locked --manifest-path native/Cargo.toml
 ```
 
 The headless GPUI tests exercise keyboard search, unread filtering, folder actions, and the empty mailbox at the minimum window size.
@@ -33,13 +33,17 @@ pwsh -NoProfile -File native/benchmark.ps1 -ElectronExe 'C:\path\to\win-unpacked
 
 The benchmark isolates the Electron profile and suppresses DNS for that session. It measures shell startup and idle memory, with mail sync and network performance outside its scope.
 
+Pass `-PreviousNativeExe` to include an earlier Rust build in the same run. The launch order rotates on each pass.
+
 ### Windows preview results
 
-Medians from five runs per app on an Intel Core i7-11700K PC. Each app measured an empty mailbox after one warm-up launch.
+Medians from five runs per build on an Intel Core i7-11700K PC. All three builds ran in the same session with an empty mailbox after one warm-up launch.
 
-| Metric | Electron 1.2.0 | Rust / GPUI |
-| --- | ---: | ---: |
-| Time to a titled window | 317 ms | 519 ms |
-| Idle private working set | 119.8 MiB | 17.7 MiB |
-| Processes | 4 | 1 |
-| Unpacked app files | 364.8 MiB | 18.5 MiB |
+| Metric | Electron 1.2.0 | Previous Rust preview | Rust preview with GPUI Kit |
+| --- | ---: | ---: | ---: |
+| Time to a titled window | 575 ms | 694 ms | 635 ms |
+| Idle private working set | 98.6 MiB | 17.4 MiB | 15.2 MiB |
+| Processes | 4 | 1 | 1 |
+| Unpacked app files | 364.8 MiB | 18.5 MiB | 23.6 MiB |
+
+The updated preview uses GPUI Kit 0.10.0, whose Windows backend keeps the Direct3D device created during adapter selection. [Upstream GPUI change](https://github.com/zed-industries/zed/pull/49001)

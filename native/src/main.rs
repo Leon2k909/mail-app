@@ -6,14 +6,14 @@ mod mailbox;
 #[cfg(test)]
 mod tests;
 
-use gpui::{
-    App, AppContext, Application, Bounds, Context, Div, Entity, FocusHandle, FontWeight,
-    KeyBinding, SharedString, Stateful, Subscription, Window, WindowBounds, WindowOptions, actions,
-    div, prelude::*, px, rgb, size, svg,
-};
-use gpui_component::{
+use gpui::component::{
     Root, Theme, ThemeMode,
     input::{Input, InputEvent, InputState},
+};
+use gpui::{
+    App, AppContext, Bounds, Context, Div, Entity, FocusHandle, FontWeight, KeyBinding,
+    SharedString, Stateful, Subscription, Window, WindowBounds, WindowOptions, actions, div,
+    prelude::*, px, rgb, size, svg,
 };
 use mailbox::{Folder, Message};
 
@@ -50,7 +50,7 @@ impl Mail {
             }
         });
         let focus = cx.focus_handle();
-        focus.focus(window);
+        focus.focus(window, cx);
         Self {
             folder: Folder::Inbox,
             messages: if empty {
@@ -93,7 +93,7 @@ impl Mail {
         self.unread_only = false;
         self.search
             .update(cx, |search, cx| search.set_value("", window, cx));
-        self.focus.focus(window);
+        self.focus.focus(window, cx);
         cx.notify();
     }
 
@@ -263,7 +263,7 @@ impl Mail {
                                             .on_click(cx.listener(move |this, _, window, cx| {
                                                 this.unread_only = unread;
                                                 this.selected = None;
-                                                this.focus.focus(window);
+                                                this.focus.focus(window, cx);
                                                 cx.notify();
                                             }))
                                     })),
@@ -352,7 +352,7 @@ impl Mail {
                     .child(message.preview),
             )
             .on_click(cx.listener(move |this, _, window, cx| {
-                this.focus.focus(window);
+                this.focus.focus(window, cx);
                 this.open_message(id, cx);
             }))
     }
@@ -405,7 +405,7 @@ impl Mail {
                             .on_click(cx.listener(move |this, _, window, cx| {
                                 this.messages[id].folder = folder;
                                 this.selected = None;
-                                this.focus.focus(window);
+                                this.focus.focus(window, cx);
                                 cx.notify();
                             }))
                     }))
@@ -551,7 +551,9 @@ impl Render for Mail {
                     this.step_selection(-1, cx);
                 }
             }))
-            .on_action(cx.listener(|this, _: &ReturnToList, window, _| this.focus.focus(window)))
+            .on_action(
+                cx.listener(|this, _: &ReturnToList, window, cx| this.focus.focus(window, cx)),
+            )
             .child(self.render_sidebar(cx))
             .child(self.render_list(ids, cx))
             .child(self.render_reader(cx))
@@ -559,7 +561,7 @@ impl Render for Mail {
 }
 
 fn configure_mail(cx: &mut App) {
-    gpui_component::init(cx);
+    gpui::init(cx);
     Theme::change(ThemeMode::Light, None, cx);
     cx.bind_keys([
         KeyBinding::new("ctrl-f", FocusSearch, Some("Mail")),
@@ -571,11 +573,11 @@ fn configure_mail(cx: &mut App) {
 
 fn main() {
     let empty = std::env::args().any(|arg| arg == "--empty");
-    Application::new()
+    gpui::application()
         .with_assets(icons::MailIcons)
         .run(move |cx: &mut App| {
             configure_mail(cx);
-            cx.on_window_closed(|cx| {
+            cx.on_window_closed(|cx, _| {
                 if cx.windows().is_empty() {
                     cx.quit();
                 }
