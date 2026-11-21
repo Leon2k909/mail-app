@@ -1,0 +1,439 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+:root {
+  --radius: 0.625rem;
+  --app-font: ui-sans-serif, system-ui, sans-serif;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+}
+
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
+}
+
+.theme-muse {
+  --radius: 1rem;
+  --app-font: Inter, ui-sans-serif, system-ui, sans-serif;
+  --background: #f8fafc;
+  --foreground: #0f172a;
+  --card: #ffffff;
+  --card-foreground: #0f172a;
+  --popover: #ffffff;
+  --popover-foreground: #0f172a;
+  --primary: #7c3aed;
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: #f1f5f9;
+  --secondary-foreground: #1e293b;
+  --muted: #eef2ff;
+  --muted-foreground: #64748b;
+  --accent: #f5f3ff;
+  --accent-foreground: #5b21b6;
+  --destructive: #dc2626;
+  --border: #e2e8f0;
+  --input: #e2e8f0;
+  --ring: #8b5cf6;
+}
+
+.theme-volt {
+  --radius: 0.875rem;
+  --app-font: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --background: #0c0e14;
+  --foreground: #e2e2e6;
+  --card: #1a1d2b;
+  --card-foreground: #e2e2e6;
+  --popover: #13151e;
+  --popover-foreground: #e2e2e6;
+  --primary: #e8a838;
+  --primary-foreground: #0c0e14;
+  --secondary: #21253a;
+  --secondary-foreground: #e2e2e6;
+  --muted: #13151e;
+  --muted-foreground: #9ca0b0;
+  --accent: rgba(232, 168, 56, 0.12);
+  --accent-foreground: #f4d28f;
+  --destructive: #ef4444;
+  --border: #262a3a;
+  --input: #262a3a;
+  --ring: #e8a838;
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+    outline-color: color-mix(in oklch, var(--color-ring) 50%, transparent);
+  }
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--app-font);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body::before,
+  body::after {
+    content: "";
+    pointer-events: none;
+    position: fixed;
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 180ms ease;
+  }
+
+  .theme-volt body::before,
+  .theme-volt body::after {
+    opacity: 1;
+    border-radius: 9999px;
+    filter: blur(12px);
+  }
+
+  .theme-volt body::before {
+    top: -180px;
+    left: -120px;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(232, 168, 56, 0.08), transparent 70%);
+  }
+
+  .theme-volt body::after {
+    right: -150px;
+    bottom: -250px;
+    width: 450px;
+    height: 450px;
+    background: radial-gradient(circle, rgba(34, 197, 94, 0.05), transparent 70%);
+  }
+}
+
+@layer components {
+  .mail-theme-shell {
+    min-height: 100vh;
+  }
+
+  .mail-theme-list-item {
+    position: relative;
+  }
+
+  .theme-muse .mail-theme-shell {
+    background: #f8fafc;
+    color: #0f172a;
+  }
+
+  .theme-muse .mail-theme-panels {
+    background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+  }
+
+  .theme-muse .mail-theme-main-panel,
+  .theme-muse .mail-theme-list-panel,
+  .theme-muse .mail-theme-reader-panel {
+    background: rgba(255, 255, 255, 0.96);
+  }
+
+  .theme-muse .mail-theme-main-panel {
+    border-left: 1px solid #dbe3f0;
+  }
+
+  .theme-muse .mail-theme-list-panel,
+  .theme-muse .mail-theme-reader-panel {
+    border-left: 1px solid #e2e8f0;
+  }
+
+  .theme-muse .mail-theme-header,
+  .theme-muse .mail-theme-search,
+  .theme-muse .mail-theme-toolbar,
+  .theme-muse .mail-theme-sidebar-header {
+    background: #fff;
+    backdrop-filter: none;
+  }
+
+  .theme-muse .mail-theme-list-item {
+    border-radius: 0;
+    border-color: transparent;
+    border-bottom: 1px solid #edf2f7;
+    background: transparent;
+    box-shadow: none;
+    padding: 1.1rem 1.25rem;
+  }
+
+  .theme-muse .mail-theme-list-item:hover {
+    background: #f8fafc;
+    border-color: transparent;
+  }
+
+  .theme-muse .mail-theme-list-item[data-selected="true"],
+  .theme-muse .mail-theme-list-item.bg-accent\/70 {
+    background: #fff;
+    border-color: transparent;
+    box-shadow: inset 4px 0 0 #8b5cf6;
+  }
+
+  .theme-muse .mail-theme-nav-link {
+    height: 2.9rem;
+    border-radius: 1rem;
+    font-size: 1.05rem;
+    font-weight: 500;
+  }
+
+  .theme-muse .mail-theme-nav-link[data-active="true"] {
+    background: #0f172a;
+    color: white;
+  }
+
+  .theme-muse .mail-theme-nav-link svg {
+    color: #64748b;
+  }
+
+  .theme-muse .mail-theme-nav-link[data-active="true"] svg {
+    color: white;
+  }
+
+  .theme-muse .muse-sidebar-logo {
+    background: linear-gradient(180deg, #8b5cf6 0%, #4f46e5 100%);
+    box-shadow: 0 12px 24px rgba(99, 102, 241, 0.28);
+  }
+
+  .theme-muse .muse-compose-button {
+    border-radius: 1.1rem;
+    background: #0f172a;
+    color: white;
+    box-shadow: 0 10px 20px rgba(15, 23, 42, 0.12);
+  }
+
+  .theme-muse .muse-compose-button:hover {
+    background: #111c34;
+  }
+
+  .theme-muse .muse-labels-title {
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: 0.78rem;
+    color: #94a3b8;
+    font-weight: 700;
+  }
+
+  .theme-muse .muse-account-footer {
+    background: #fff;
+    border-color: #dbe3f0;
+  }
+
+  .theme-muse .mail-theme-search {
+    padding: 0.9rem 1rem;
+  }
+
+  .theme-muse .mail-theme-search input {
+    height: 2.8rem;
+    border-radius: 1rem;
+    background: #f1f5f9;
+    border-color: transparent;
+    padding-left: 2.25rem;
+    font-size: 1.05rem;
+  }
+
+  .theme-muse [role="tablist"] {
+    border-radius: 1rem;
+    background: #eef2f7;
+    padding: 0.2rem;
+    gap: 0.3rem;
+  }
+
+  .theme-muse [role="tab"] {
+    border-radius: 0.8rem;
+  }
+
+  .theme-muse [role="tab"][data-state="active"] {
+    background: white;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+  }
+
+  .theme-muse .muse-message-avatar {
+    background: #0f172a;
+    border-radius: 1rem;
+  }
+
+  .theme-muse .mail-theme-reader .text-sm.whitespace-pre-wrap,
+  .theme-muse .mail-theme-reader .leading-relaxed {
+    font-size: 1.05rem;
+    line-height: 1.9;
+    color: #1e293b;
+  }
+
+  .theme-muse .mail-theme-reader .p-4 {
+    padding: 1.5rem;
+  }
+
+  .theme-muse .mail-theme-toolbar {
+    justify-content: flex-end;
+    padding: 0.9rem 1.25rem;
+  }
+
+  .theme-muse .mail-theme-toolbar > :first-child,
+  .theme-muse .mail-theme-toolbar > .Separator:first-of-type {
+    display: none;
+  }
+
+  .theme-muse .mail-theme-settings-sidebar {
+    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  }
+
+  .theme-muse .mail-theme-settings-content {
+    background: linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
+  }
+
+  .theme-volt .mail-theme-shell {
+    background: #0c0e14;
+    color: #e2e2e6;
+  }
+
+  .theme-volt .mail-theme-panels {
+    gap: 0;
+    background: transparent;
+  }
+
+  .theme-volt .mail-theme-main-panel,
+  .theme-volt .mail-theme-list-panel,
+  .theme-volt .mail-theme-reader-panel,
+  .theme-volt .mail-theme-settings-sidebar,
+  .theme-volt .mail-theme-settings-content {
+    background: transparent;
+  }
+
+  .theme-volt .mail-theme-list-panel,
+  .theme-volt .mail-theme-reader-panel {
+    border-left: 1px solid #262a3a;
+  }
+
+  .theme-volt .mail-theme-sidebar-header,
+  .theme-volt .mail-theme-header,
+  .theme-volt .mail-theme-search,
+  .theme-volt .mail-theme-toolbar {
+    background: rgba(19, 21, 30, 0.74);
+    backdrop-filter: blur(20px);
+  }
+
+  .theme-volt .mail-theme-list-item {
+    border-radius: 1rem;
+    border: 1px solid #262a3a;
+    background: #1a1d2b;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02);
+  }
+
+  .theme-volt .mail-theme-list-item:hover {
+    background: #21253a;
+  }
+
+  .theme-volt .mail-theme-list-item.bg-accent\/70 {
+    background: #1e2236;
+    border-color: #e8a838;
+    box-shadow: inset 3px 0 0 #e8a838;
+  }
+
+  .theme-volt .mail-theme-nav-link {
+    border-radius: 0.95rem;
+    color: #9ca0b0;
+  }
+
+  .theme-volt .mail-theme-nav-link:hover {
+    background: #1a1d2b;
+    color: #e2e2e6;
+  }
+
+  .theme-volt .mail-theme-nav-link[data-active="true"] {
+    background: #e8a838;
+    color: #0c0e14;
+  }
+
+  .theme-volt .mail-theme-reader,
+  .theme-volt .mail-theme-settings {
+    color: #e2e2e6;
+  }
+
+  .theme-volt .mail-theme-settings-sidebar {
+    background: rgba(19, 21, 30, 0.92);
+  }
+
+  .theme-volt .mail-theme-settings-content {
+    background: transparent;
+  }
+
+  .theme-volt .mail-theme-settings-content > div:last-child {
+    background: transparent;
+  }
+
+  .theme-volt .mail-theme-settings .rounded-lg,
+  .theme-volt .mail-theme-settings .rounded-xl,
+  .theme-volt .mail-theme-settings [class*="rounded-md"] {
+    border-radius: 1rem;
+  }
+
+  .theme-volt .mail-theme-settings .border,
+  .theme-volt .mail-theme-reader .border,
+  .theme-volt .mail-theme-list-panel .border {
+    border-color: #262a3a;
+  }
+
+  .theme-volt input,
+  .theme-volt textarea,
+  .theme-volt [role="combobox"],
+  .theme-volt button[data-slot="select-trigger"] {
+    background: #13151e;
+    border-color: #262a3a;
+  }
+}

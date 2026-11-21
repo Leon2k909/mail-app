@@ -1,0 +1,30 @@
+# Builds the Windows installer and publishes it as a GitHub Release.
+# Installed copies of Mail check these releases and update themselves.
+#
+# To ship a version: bump "version" in package.json, commit, then
+#   git tag v<version> && git push origin main --tags
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - name: Build installer and publish release
+        run: npx electron-builder --win --x64 --publish always
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
